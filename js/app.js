@@ -4,12 +4,14 @@
 
 const userDataURL = 'https://randomuser.me/api/?results=12&inc=name,picture,email,phone,dob,location&nat=us';
 const gallery = document.getElementById('gallery');
-const searchBar = document.getElementsByClassName('search-container');
+const searchBar = document.querySelector('.search-container');
 
 const modals = document.createElement('div');
 modals.classList.add('modal-container');
 modals.style.display = 'none'
 const singleModal = document.getElementsByClassName("modal");
+const nameList = document.getElementsByClassName('modal-name');
+
 
 
 
@@ -23,6 +25,7 @@ fetch(userDataURL)
         console.log(data.results);
         generateEmployeeData(data.results);
         generateModal(data.results)
+        generateSearchBar()
     })
     .catch( error => console.log ('An error has occured.', error) )
 
@@ -89,24 +92,48 @@ function generateModal(users) {
         singleModal[i].style.display = "none";
     }
     
-    // Disable 'Prev' Button for First Modal and 'Next' Button for Last Modal
+    // Hide 'Prev' Button for First Modal and 'Next' Button for Last Modal
     const firstPrevBtn = document.getElementsByClassName('modal-prev')[0]
     const lastNextBtn = document.getElementsByClassName('modal-next')[singleModal.length - 1]
 
-    firstPrevBtn.disabled = true;
-    firstPrevBtn.classList.add('disabled');
-    lastNextBtn.disabled = true;
-    lastNextBtn.classList.add('disabled');
+    firstPrevBtn.style.display = 'none';
+    lastNextBtn.style.display = 'none';
 
 }
 
+
+// Search Bar
+// need to create search from API
+
+function generateSearchBar (){
+    html = 
+    `
+    <form action="#" method="get">
+    <input type="search" id="search-input" class="search-input" placeholder="Search...">
+    <input type="submit" value="&#x1F50D;" id="search-submit" class="search-submit">
+    </form>
+    `
+    searchBar.insertAdjacentHTML('beforeend', html);
+}
+
+function searchName(input,nameList){
+    let searchList = [];
+ // create a for loop to go through the list to find student based on first or last name
+    for (i = 0; i < nameList.length; i++){
+ // create a conditional statement to check if the input includes any first name or last name. Reminder to change to lower case.      
+       if(nameList[i].textContent.toLowerCase().includes(input.value.toLowerCase()) || nameList[i].textContent.toLowerCase().includes(input.value.toLowerCase()) ){
+ // if it matches, push it into the searchList array.
+          searchList.push(nameList[i]);
+
+       }
+    }
+}
 
 // ---------------------------------
 // EVENT LISTENERS
 // ---------------------------------
 
 // When user click on the card, modal pops up
-
 // if the card s/n gets click, the corresponding modal will get pop.
 
 
@@ -132,28 +159,25 @@ modals.addEventListener('click', (e) => {
     }
 })
 
-// When user click next or previous button within modal.
+// When user click next or previous button within modal, it will show either the previous and next modal correspondingly.
 
 modals.addEventListener('click', (e) => {
-    currentIndex = e.target.closest('.modal').getAttribute('data-index') // error after clicking outside of modal
-    nextIndex = parseInt(currentIndex) + 1;
-    prevIndex = parseInt(currentIndex) - 1;
+    const currentModal = e.target.closest('.modal'); 
 
-    if (e.target.textContent === 'Prev' && prevIndex >= 0){
-        singleModal[currentIndex].style.display = 'none';
-        singleModal[prevIndex].style.display = '';
-     } else if (e.target.textContent === 'Next' && nextIndex <= 11){
-         singleModal[currentIndex].style.display = 'none';
-         singleModal[nextIndex].style.display = '';
+    if (e.target.textContent === 'Prev') {
+        const prevModal = currentModal.previousElementSibling;
+        currentModal.style.display = 'none';
+        prevModal.style.display = '';
+     } else if (e.target.textContent === 'Next') {
+        const nextModal = currentModal.nextElementSibling;
+        currentModal.style.display = 'none';
+        nextModal.style.display = '';
      }
 
 })
 
+// When user searches for name, show matched names
 
-// need to create search from API
-
-
-
-
-
-
+searchBar.addEventListener('keyup', (e) => {
+    console.log(e.target.textContent)
+})
